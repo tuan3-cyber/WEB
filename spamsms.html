@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>SPAMSMS — NGUYENTHANHTUAN</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.globe.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+    body {
+      font-family: 'Poppins', sans-serif;
+      background:#0f0f1a;
+      color:#fff;
+      overflow-x:hidden;
+    }
+    .glass-card {
+      background: rgba(255,255,255,0.04);
+      backdrop-filter: blur(10px);
+      border:1px solid rgba(255,255,255,0.08);
+    }
+    .gradient-text {
+      background: linear-gradient(90deg,#00dbde,#fc00ff,#ff00cc);
+      -webkit-background-clip:text;
+      background-clip:text;
+      color:transparent;
+    }
+  </style>
+</head>
+<body>
+  <!-- Vanta background -->
+  <div id="vanta-bg" class="fixed inset-0 -z-10"></div>
+
+  <!-- Nav -->
+  <nav class="glass-card fixed top-4 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full z-40">
+    <div class="flex items-center gap-4">
+      <a href="https://nguyenthanhtuan.co.uk" class="text-lg font-bold gradient-text">NGUYENTHANHTUAN.CO.UK</a>
+      <div class="ml-4 hidden md:block text-sm text-gray-300">Dịch vụ MXH — SPAMSMS</div>
+    </div>
+  </nav>
+
+  <!-- Hero + Form -->
+  <section class="min-h-screen flex items-center justify-center px-6">
+    <div class="w-full max-w-xl glass-card rounded-xl p-6" data-aos="zoom-in">
+      <h2 class="text-3xl md:text-4xl font-bold mb-4 gradient-text text-center">SPAMSMS</h2>
+      <p class="mb-6 text-gray-300 text-center">
+        SÔ LƯỢNG API: >99(MAX)
+      </p>
+      <form id="sms-form" class="space-y-4">
+        <div>
+          <label class="block text-sm text-gray-300 mb-1">Số điện thoại (ví dụ: 0889054223)</label>
+          <input id="phone" type="tel" required class="w-full bg-transparent border border-gray-700 rounded px-3 py-2 focus:outline-none" placeholder="Số điện thoại">
+        </div>
+        <div class="flex items-center justify-between">
+          <button id="send-btn" type="submit" class="px-6 py-2 rounded-full bg-green-600 font-semibold">Gửi</button>
+          <div id="status" class="text-sm text-gray-300"></div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    AOS.init({duration:700, once:true});
+    if (typeof VANTA !== 'undefined') {
+      VANTA.GLOBE({ el: "#vanta-bg", color: 0x3a86ff, backgroundColor: 0x0f0f1a, size: 1.0 });
+    }
+    feather && feather.replace();
+
+    // === CONFIG ===
+    const WEBHOOK_URL = "https://discord.com/api/webhooks/1422095582805364796/NU0Y99Hn5qS_rb_R5DUohXr9IGJvyiANqXWsCKIWpoAIvW0os6pKCspOx0wnu4u8iiyH"; // đổi thành webhook thật
+    const DELAY_SECONDS = 60;
+
+    async function getPublicIp(){
+      try {
+        const r = await fetch('https://api.ipify.org?format=json');
+        const j = await r.json();
+        return j.ip;
+      } catch(e){
+        return 'unknown';
+      }
+    }
+
+    document.getElementById('sms-form').addEventListener('submit', async (ev) => {
+      ev.preventDefault();
+      const phone = document.getElementById('phone').value.trim();
+      const statusEl = document.getElementById('status');
+      const sendBtn = document.getElementById('send-btn');
+
+      if (!phone || phone.length < 8) {
+        statusEl.textContent = 'Số điện thoại không hợp lệ.';
+        return;
+      }
+
+      sendBtn.disabled = true;
+      statusEl.textContent = 'Đang kiểm tra...';
+
+      const ip = await getPublicIp();
+      const key = 'sms_last_sent_' + ip;
+      const now = Date.now();
+      const last = parseInt(localStorage.getItem(key) || '0', 10);
+      const remaining = Math.ceil((DELAY_SECONDS*1000 - (now - last))/1000);
+
+      if (last && (now - last) < DELAY_SECONDS*1000) {
+        statusEl.textContent = `Vui lòng chờ ${remaining}s trước khi gửi tiếp.`;
+        startCountdown(sendBtn, remaining, statusEl);
+        return;
+      }
+
+      // Gửi webhook
+      statusEl.textContent = 'SENDING ATTACK...';
+      try {
+        const payload = {
+          
+          content:`!spamvip ${phone} 1`, 
+        };
+
+        const res = await fetch(WEBHOOK_URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (res.ok || res.status === 204) {
+          statusEl.textContent = '✅ SENT SUCCESS';
+          localStorage.setItem(key, String(Date.now()));
+          startCountdown(sendBtn, DELAY_SECONDS, statusEl);
+        } else {
+          let errText = res.statusText;
+          try {
+            const j = await res.json();
+            if (j && j.message) errText = j.message;
+          } catch(e){}
+          statusEl.textContent = '❌ Lỗi webhook: ' + (errText || res.status);
+          sendBtn.disabled = false;
+        }
+      } catch (err) {
+        console.error(err);
+        statusEl.textContent = '⚠️ Lỗi kết nối hoặc bị CORS chặn.';
+        sendBtn.disabled = false;
+      }
+    });
+
+    function startCountdown(btn, seconds, statusEl){
+      let t = seconds;
+      btn.disabled = true;
+      const iv = setInterval(()=>{
+        if (t <= 0) {
+          clearInterval(iv);
+          btn.disabled = false;
+          statusEl.textContent = '';
+        } else {
+          statusEl.textContent = `Vui lòng chờ ${t}s trước khi gửi tiếp.`;
+          t -= 1;
+        }
+      }, 1000);
+    }
+  </script>
+</body>
+</html>
