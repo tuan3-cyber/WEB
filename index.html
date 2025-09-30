@@ -110,37 +110,54 @@
     <!-- Navigation -->
     <nav class="glass-card fixed top-0 left-0 w-full z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex items-center justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0">
-                        <h1 class="text-2xl font-bold gradient-text">NGUYENTHANHTUAN.CO.UK</h1>
-                    </div>
-                </div>
-                <div class="hidden md:flex items-center space-x-2">
-                    <div class="relative">
-                        <input type="text" placeholder="Tìm dịch vụ..." class="bg-gray-800 bg-opacity-50 border border-gray-700 rounded-full py-1 px-4 text-white focus:outline-none focus:ring-2 focus:ring-purple-500 w-64">
-                        <i data-feather="search" class="absolute right-3 top-2 text-gray-400"></i>
-                    </div>
-                    <a href="https://zalo.me/0889054885" class="flex items-center bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full transition-all duration-300 hover:scale-105">
-                        <i data-feather="message-circle" class="w-4 h-4 mr-1"></i> Nhắn Zalo
-                    </a>
-                </div>
-                <div class="hidden md:block">
-                    <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="https://nguyenthanhtuan.co.uk" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white hover:bg-opacity-10 transition-all duration-300">Trang chủ</a>
-                        <a href="https://nguyenthanhtuan.co.uk/spamsms.html" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white hover:bg-opacity-10 transition-all duration-300">SpamSMS Free</a>
-                        <a href="https://zalo.me/0889054885" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white hover:bg-opacity-10 transition-all duration-300">Dịch vụ</a>
-                        <a href="https://zalo.me/0889054885" class="px-3 py-2 rounded-md text-sm font-medium text-white hover:bg-white hover:bg-opacity-10 transition-all duration-300">Liên hệ</a>
-                    </div>
-                </div>
-                <div class="md:hidden">
-                    <button class="text-white focus:outline-none">
-                        <i data-feather="menu"></i>
-                    </button>
-                </div>
+          <div class="flex items-center justify-between h-16">
+            <!-- Logo -->
+            <h1 class="text-2xl font-bold gradient-text">NGUYENTHANHTUAN.CO.UK</h1>
+      
+            <!-- PC menu -->
+            <div class="hidden md:flex items-center space-x-6">
+              <a href="/" class="text-white hover:text-purple-400">Trang chủ</a>
+              <a href="/spamsms" class="text-white hover:text-purple-400">SpamSMS Free</a>
+              <a href="https://zalo.me/0889054885" class="text-white hover:text-purple-400">Dịch vụ</a>
+              <a href="https://zalo.me/0889054885" class="text-white hover:text-purple-400">Liên hệ</a>
             </div>
+      
+            <!-- Mobile button -->
+            <button id="menu-btn" class="md:hidden text-white focus:outline-none">
+              <i data-feather="menu"></i>
+            </button>
+          </div>
         </div>
-    </nav>
+      
+        <!-- Mobile menu (ẩn mặc định) -->
+        <div id="menu" class="hidden md:hidden bg-gray-900 bg-opacity-95 px-4 py-3 space-y-2 transform origin-top transition-all duration-300 ease-out">
+          <a href="/" class="block text-white hover:text-purple-400">Trang chủ</a>
+          <a href="/spamsms" class="block text-white hover:text-purple-400">SpamSMS Free</a>
+          <a href="https://zalo.me/0889054885" class="block text-white hover:text-purple-400">Dịch vụ</a>
+          <a href="https://zalo.me/0889054885" class="block text-white hover:text-purple-400">Liên hệ</a>
+        </div>
+      </nav>
+      
+      <script>
+        feather.replace();
+      
+        const btn = document.getElementById("menu-btn");
+        const menu = document.getElementById("menu");
+      
+        btn.addEventListener("click", () => {
+          if (menu.classList.contains("hidden")) {
+            menu.classList.remove("hidden");
+            menu.classList.add("scale-y-100", "opacity-100");
+            menu.classList.remove("scale-y-0", "opacity-0");
+          } else {
+            menu.classList.add("scale-y-0", "opacity-0");
+            setTimeout(() => menu.classList.add("hidden"), 300); // chờ animation xong mới ẩn
+          }
+        });
+      
+        // setup trạng thái ban đầu
+        menu.classList.add("scale-y-0", "opacity-0");
+      </script>
 
     <!-- Hero Section -->
     <section class="relative h-screen flex items-center justify-center overflow-hidden">
